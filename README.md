@@ -8,4 +8,6 @@
 
 ## To-do list
 + Entrega E01 - 9 a 13 Outubro - Diagrama conceptual intermédio (Entidade-Associação) elaborado individualmente.
++ Entrega E1 - 6 de Novembro
++ Entrega E2 - 12 de Dezembro
 
