@@ -1,21 +1,24 @@
 CREATE TABLE Produto(
   nome VARCHAR(80),
   tipo VARCHAR(20),
-  designação_genérica VARCHAR(30),
+  designação_generica VARCHAR(30),
   marca VARCHAR(30),
-  mercado VARCHAR(10),
-  numero_identificação INT(10)
+  mercado VARCHAR(20),
+  numero_identificacao INT(10),
+  PRIMARY KEY (numero_identificacao)
 );
 
 CREATE TABLE Empresa(
   morada_sede VARCHAR(100),
   nif INT(9),
-  capital_social INT(20)
+  capital_social INT(20),
+  nome VARCHAR(80),
+  PRIMARY KEY (nif)
 );
 
 CREATE TABLE Contactos_EcoFCUL(
   email VARCHAR(254),
-  nome VARCHAR(20),
+  nome VARCHAR(80),
   telefone INT(9),
   nif INT(9),
   PRIMARY KEY (email, nif),
