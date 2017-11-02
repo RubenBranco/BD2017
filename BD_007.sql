@@ -1,7 +1,7 @@
 CREATE TABLE Produto(
   nome VARCHAR(80),
   tipo VARCHAR(20),
-  designação_generica VARCHAR(30),
+  designacao_generica VARCHAR(30),
   marca VARCHAR(30),
   mercado VARCHAR(20),
   numero_identificacao INT(10),
