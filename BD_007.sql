@@ -120,7 +120,7 @@ CREATE TABLE Artigo_cientifico(
   autor VARCHAR(40),
   titulo VARCHAR(30),
   editora VARCHAR(30),
-  data_publicacao DATE(),
+  data_publicacao DATE,
   PRIMARY KEY (id)
 );
 
