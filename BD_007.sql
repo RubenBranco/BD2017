@@ -35,9 +35,7 @@ CREATE TABLE Contactos_EcoFCUL(
   email VARCHAR(254),
   nome VARCHAR(80),
   telefone INT(9),
-  nif INT(9),
-  FOREIGN KEY (nif) REFERENCES Empresa(nif) ON DELETE CASCADE,
-  PRIMARY KEY (email, nif)
+  PRIMARY KEY (email)
 );
 
 
@@ -46,14 +44,15 @@ CREATE TABLE Contactos_Publicos(
   linha_atendimento INT(9),
   email VARCHAR(254),
   nif INT(9),
-  FOREIGN KEY (nif) REFERENCES Empresa(nif),
+  FOREIGN KEY (nif) REFERENCES Empresa(nif) ON DELETE CASCADE,
   PRIMARY KEY (email, nif)
 );
 
-CREATE TABLE Tem_contactos_publicos(
+CREATE TABLE Tem_contactos_ecofcul(
   nif_empresa INT(9),
   email VARCHAR(254),
   FOREIGN KEY (nif_empresa) REFERENCES Empresa(nif),
+  FOREIGN KEY (email) REFERENCES Contactos_EcoFCUL(email),
   PRIMARY KEY (nif_empresa, email)
 );
 
