@@ -60,7 +60,8 @@ CREATE TABLE Consumidor(
   email VARCHAR(254),
   senha_acesso INT(254),
   sexo VARCHAR(1),
-  PRIMARY KEY (email)
+  PRIMARY KEY (email),
+  CHECK (sexo="M" OR sexo="F")
 );
 
 CREATE TABLE Elemento_do_agregado_familiar(
