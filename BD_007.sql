@@ -30,6 +30,39 @@ CREATE TABLE Empresa(
   PRIMARY KEY (nif)
 );
 
+CREATE TABLE Tem_relacoes(
+  percentagem DECIMAL(5,2),
+  nif_empresa_um INT(9),
+  nif_empresa_dois INT(9),
+  FOREIGN KEY (nif_empresa_um) REFERENCES Empresa(nif),
+  FOREIGN KEY (nif_empresa_dois) REFERENCES Empresa(nif),
+  PRIMARY KEY (nif_empresa_um,nif_empresa_dois),
+  CHECK (percentagem>=000.00 AND percentagem <= 100.00)
+);
+
+CREATE TABLE Produz(
+  nif_empresa INT(9),
+  numero_identificacao_produto INT(10),
+  PRIMARY KEY (nif_empresa,numero_identificacao_produto)
+);
+
+CREATE TABLE Distribui(
+  nif_empresa INT(9),
+  numero_identificacao_produto INT(10),
+  PRIMARY KEY (nif_empresa,numero_identificacao_produto)
+);
+
+CREATE TABLE Envolvimento(
+  tipo VARCHAR(20),
+  percentagem DECIMAL(5,2),
+  nif_empresa INT(9),
+  nif_especialista INT(9),
+  FOREIGN KEY (nif_especialista) REFERENCES Especialista(nif),
+  FOREIGN KEY (nif_empresa) REFERENCES Empresa(nif),
+  PRIMARY KEY (nif_empresa, nif_especialista,tipo),
+  CHECK (percentagem>000.00 AND percentagem <= 100.00)
+);
+
 CREATE TABLE Contactos_EcoFCUL(
   email VARCHAR(254),
   nome VARCHAR(80),
@@ -105,13 +138,13 @@ CREATE TABLE Elemento(
 );
 
 CREATE TABLE Composto_por(
-  percentagem DECIMAL(3,2),
+  percentagem DECIMAL(5,2),
   numero_identificacao_produto INT(10),
   numero_identificacao_elemento INT(10),
   FOREIGN KEY (numero_identificacao_elemento) REFERENCES Elemento(numero_identificacao),
   FOREIGN KEY (numero_identificacao_produto) REFERENCES Produto(numero_identificacao),
   PRIMARY KEY (numero_identificacao_produto, numero_identificacao_elemento),
-  CHECK (percentagem>000.00 AND percentagem < 100.00)
+  CHECK (percentagem>000.00 AND percentagem <= 100.00)
 );
 
 CREATE TABLE Artigo_cientifico(
@@ -160,6 +193,25 @@ INSERT INTO Produto (tipo, designacao_generica, marca, mercado, numero_identific
 -- EMPRESA
 INSERT INTO Empresa (morada_sede, nif, capital_social, nome, nif_especialista) VALUES ("Rua António Boto, nr 32", 132654789, 30000000000,"Pirelli Enterprises", 255364788);
 INSERT INTO Empresa (morada_sede, nif, capital_social, nome, nif_especialista) VALUES ("Rue Delwart, nr 107", 243765890, 90000000,"Belgas Company", 234830248);
+-- END
+
+-- TEM RELACOES (SO HA DUAS EMPRESAS PORTANTO SO E POSSIVEL UM INSERT)
+INSERT INTO Tem_relacoes (percentagem, nif_empresa_um, nif_empresa_dois) VALUES (60.12, 132654789, 243765890);
+-- END
+
+-- PRODUZ
+INSERT INTO Produz (nif_empresa, numero_identificacao_produto) VALUES (132654789, 234);
+INSERT INTO Produz (nif_empresa, numero_identificacao_produto) VALUES (243765890, 320);
+-- END
+
+-- DISTRIBUI
+INSERT INTO Distribui (nif_empresa, numero_identificacao_produto) VALUES (243765890, 234);
+INSERT INTO Distribui (nif_empresa, numero_identificacao_produto) VALUES (132654789, 320);
+-- END
+
+-- ENVOLVIMENTO
+INSERT INTO Envolvimento (tipo, percentagem, nif_empresa, nif_especialista) VALUES ("familiar", 100.00, 132654789, 255364788);
+INSERT INTO Envolvimento (tipo, percentagem, nif_empresa, nif_especialista) VALUES ("financeiro", 49.35, 243765890, 234830248);
 -- END
 
 -- CONTACTOS ECOFCUL
