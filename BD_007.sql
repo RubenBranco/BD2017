@@ -10,9 +10,8 @@ CREATE TABLE Especialista(
 );
 
 CREATE TABLE Produto(
-  nome VARCHAR(80),
   tipo VARCHAR(20),
-  designacao_generica VARCHAR(30),
+  designacao_generica VARCHAR(80),
   marca VARCHAR(30),
   mercado VARCHAR(20),
   numero_identificacao INT(10),
@@ -154,8 +153,8 @@ INSERT INTO Especialista (nacionalidade, telefone, nome, nif, senha_acesso, emai
 -- END
 
 -- PRODUTO
-INSERT INTO Produto (nome, tipo, designacao_generica, marca, mercado, numero_identificacao, nif_especialista) VALUES ("Bolachas belgas", "comida","Bolachas belgas","Belgas","Retalhista", 234, 234830248);
-INSERT INTO Produto (nome, tipo, designacao_generica, marca, mercado, numero_identificacao, nif_especialista) VALUES ("Pneus Pirelli", "Material de carros","Pneus Pirelli","Pirelli","Retalhista", 320, 255364788);
+INSERT INTO Produto (tipo, designacao_generica, marca, mercado, numero_identificacao, nif_especialista) VALUES ("comida","Bolachas belgas","Belgas","Retalhista", 234, 234830248);
+INSERT INTO Produto (tipo, designacao_generica, marca, mercado, numero_identificacao, nif_especialista) VALUES ("Material de carros","Pneus Pirelli","Pirelli","Retalhista", 320, 255364788);
 -- END
 
 -- EMPRESA
