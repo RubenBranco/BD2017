@@ -3,7 +3,7 @@ CREATE TABLE Especialista(
   telefone INT(9),
   nome VARCHAR(80),
   nif INT(9),
-  senha_acesso INT(254),
+  senha_acesso VARCHAR(254),
   email VARCHAR(254),
   morada VARCHAR(100),
   PRIMARY KEY (nif)
@@ -90,10 +90,20 @@ CREATE TABLE Tem_contactos_ecofcul(
 
 CREATE TABLE Consumidor(
   email VARCHAR(254),
-  senha_acesso INT(254),
+  senha_acesso VARCHAR(254),
   sexo VARCHAR(1),
   PRIMARY KEY (email),
   CHECK (sexo="M" OR sexo="F")
+);
+
+CREATE TABLE Consome(
+  data DATE,
+  quantidade INT(5),
+  email_consumidor VARCHAR(254),
+  numero_identificacao_produto INT(10),
+  FOREIGN KEY (numero_identificacao_produto) REFERENCES Produto(numero_identificacao),
+  FOREIGN KEY (email_consumidor) REFERENCES Consumidor(email),
+  PRIMARY KEY (data,email_consumidor,numero_identificacao_produto)
 );
 
 CREATE TABLE Elemento_do_agregado_familiar(
@@ -234,9 +244,14 @@ INSERT INTO Consumidor (email,senha_acesso,sexo) VALUES ("gbis@gmail.com","gb1$"
 INSERT INTO Consumidor (email,senha_acesso,sexo) VALUES ("acsc@gmail.com","4C$c","F");
 -- END
 
+-- CONSOME
+INSERT INTO Consome (data, quantidade, email_consumidor, numero_identificacao_produto) VALUES ("2017-11-01", 2, "gbis@gmail.com", 234);
+INSERT INTO Consome (data, quantidade, email_consumidor, numero_identificacao_produto) VALUES ("2017-11-03", 1, "acsc@gmail.com", 320);
+-- END
+
 -- ELEMENTO DO AGREGADO FAMILIAR
-INSERT INTO Elemento_do_agregado_familiar (nif, data_de_nascimento, email) VALUES (253984769,1998-08-24,"gbis@gmail.com");
-INSERT INTO Elemento_do_agregado_familiar (nif, data_de_nascimento, email) VALUES (254095870,1998-01-15,"acsc@gmail.com");
+INSERT INTO Elemento_do_agregado_familiar (nif, data_de_nascimento, email) VALUES (253984769,"1998-08-24","gbis@gmail.com");
+INSERT INTO Elemento_do_agregado_familiar (nif, data_de_nascimento, email) VALUES (254095870,"1998-01-15","acsc@gmail.com");
 -- END
 
 -- RISCOS DE SAUDE
@@ -265,8 +280,8 @@ INSERT INTO Composto_por (percentagem, numero_identificacao_produto, numero_iden
 -- END
 
 -- ARTIGO CIENTIFICO
-INSERT INTO Artigo_cientifico (id, autor, titulo, editora, data_publicacao) VALUES (230,"Hans","RubberOff", "Nature", 2017-03-28);
-INSERT INTO Artigo_cientifico (id, autor, titulo, editora, data_publicacao) VALUES (125,"Hans","RubberOff - Revision", "Nature", 2017-01-12);
+INSERT INTO Artigo_cientifico (id, autor, titulo, editora, data_publicacao) VALUES (230,"Hans","RubberOff", "Nature", "2017-03-28");
+INSERT INTO Artigo_cientifico (id, autor, titulo, editora, data_publicacao) VALUES (125,"Hans","RubberOff - Revision", "Nature", "2017-01-12");
 -- END
 
 -- REFERENCIA RISCOS DE SAUDE
