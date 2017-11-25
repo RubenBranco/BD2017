@@ -18,3 +18,9 @@ FROM Consumidor C, compra COMP
 WHERE C.numero = COMP.consumidor AND COMP.produto = 1 AND COMP.prodMarca = 16
 
 -- 4. Email do(s) consumidor(es) que comprou mais gasolina.
+
+SELECT MAX(COMP.quantidade)
+FROM Consumidor C, compra COMP
+WHERE C.numero = COMP.consumidor AND COMP.produto = 1 AND COMP.prodMarca = 16
+
+-- 5. Determine a pegada ecológica associada a cada um dos produtos do tipo lar.
