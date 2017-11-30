@@ -45,12 +45,28 @@ Where (PROD.nome) = (Select PROD.Nome,SUM(ELEM.saude) AS sum_saude
        Group BY PROD.nome
        ORDER BY sum_saude DESC 
        LIMIT 1)
+--Devolve certo      
+SELECT PROD.nome
+FROM Produto PROD,Elemento ELEM, Composto COMP
+Where PROD.marca = COMP.prodMarca AND ELEM.codigo = COMP.elemento
+       Group BY PROD.nome
+       HAVING SUM(saude) = (Select SUM(ELEM.saude) AS sum_saude
+                            FROM Produto PROD, Elemento ELEM, Composto COMP
+                            Where PROD.marca = COMP.prodMarca AND ELEM.codigo = COMP.elemento
+                            Group BY PROD.nome
+                            ORDER BY sum_saude DESC 
+                            LIMIT 1)
 --7. Liste o sexo e a idade de todas as pessoas abrangidas por esta base de dados –
 --consumidores e seus dependentes.
---NOT COMPLETE // consumidor "pikachu" não aparece na tabela final
-SELECT CONS.sexo, CONS.nascimento
+--NOT COMPLETE
+SELECT CONS.sexo, year(CURDATE()) - year(CONS.nascimento) as Idade
 FROM Consumidor CONS
 LEFT JOIN Dependente ON CONS.numero = Dependente.consumidor
+
+--Correct?
+SELECT Consumidor.sexo, year(CURDATE()) - year(Consumidor.nascimento) as Idade FROM Consumidor
+UNION ALL
+SELECT Dependente.sexo, year(CURDATE()) - year(Dependente.nascimento) as Idade FROM Dependente;
 
 --8. Email do(s) consumidor(es) que registou compras implicando menor pegada
 --ecológica – ter em conta o número de dependentes, dividindo a mesma pelo
