@@ -47,7 +47,7 @@ Where (PROD.nome) = (Select PROD.Nome,SUM(ELEM.saude) AS sum_saude
        LIMIT 1)
 --7. Liste o sexo e a idade de todas as pessoas abrangidas por esta base de dados –
 --consumidores e seus dependentes.
---NOT COMPLETE
+--NOT COMPLETE // consumidor "pikachu" não aparece na tabela final
 SELECT CONS.sexo, CONS.nascimento
 FROM Consumidor CONS
 LEFT JOIN Dependente ON CONS.numero = Dependente.consumidor
