@@ -1,11 +1,4 @@
 
-Drop table  Dependente ;
-Drop table  compra ;
-Drop table  Consumidor ;
-Drop table  composto ;
-Drop table  Produto ;
-Drop table  Marca ;
-Drop table  Elemento ;
 
 Create table  Consumidor  (
 	numero	int(9),
