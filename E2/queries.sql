@@ -34,23 +34,14 @@ WHERE COMP.produto = 1 AND COMP.prodMarca = 16);
 
 -- 5. Determine a pegada ecológica associada a cada um dos produtos do tipo lar.
 
-SELECT P.nome, C.percentagem * E.pegadaEcologica
+SELECT P.nome, C.percentagem * E.pegadaEcologica as "Pegada Ecologica"
 FROM Produto P, composto C, Elemento E
 WHERE P.tipo = 'lar' AND C.produto = P.codigo AND C.prodMarca = P.marca AND C.elemento = E.codigo
 GROUP BY P.nome;
 
 -- 6. Nome do(s) produto(s) mais prejudicial para a saúde – quanto maiores os valores
 -- no atributo “saúde”, mais prejudiciais são para a mesma.
--- NOT COMPLETE// subquerie consegue devolver a soma das "saude" para se saber o pior
-SELECT PROD.nome
-FROM Produto PROD,Elemento ELEM
-Where (PROD.nome) = (Select PROD.Nome,SUM(ELEM.saude) AS sum_saude
-       FROM Produto PROD, Elemento ELEM, Composto COMP
-       Where PROD.marca = COMP.prodMarca AND ELEM.codigo = COMP.elemento
-       Group BY PROD.nome
-       ORDER BY sum_saude DESC 
-       LIMIT 1)
--- Devolve certo
+
 SELECT PROD.nome
 FROM Produto PROD,Elemento ELEM, Composto COMP
 Where PROD.marca = COMP.prodMarca AND ELEM.codigo = COMP.elemento
@@ -90,6 +81,6 @@ SELECT C.email
 FROM Consumidor C, compra COMP, Elemento E, Produto P, composto CO
 WHERE C.numero = COMP.consumidor AND COMP.produto = P.codigo AND COMP.prodMarca = P.marca AND COMP.produto = CO.produto AND COMP.prodMarca = CO.prodMarca
 GROUP BY c.email
-HAVING COUNT (CO.elemento) = (SELECT COUNT (*)	
+HAVING COUNT(CO.elemento) = (SELECT COUNT(*)	
 							  FROM Elemento E);
 -- da erro nao sei pq
