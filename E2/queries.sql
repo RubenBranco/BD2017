@@ -36,8 +36,7 @@ WHERE COMP.produto = 1 AND COMP.prodMarca = 16);
 
 SELECT P.nome, C.percentagem * E.pegadaEcologica as "Pegada Ecologica"
 FROM Produto P, composto C, Elemento E
-WHERE P.tipo = 'lar' AND C.produto = P.codigo AND C.prodMarca = P.marca AND C.elemento = E.codigo
-GROUP BY P.nome;
+WHERE P.tipo = 'lar' AND C.produto = P.codigo AND C.prodMarca = P.marca AND C.elemento = E.codigo;
 
 -- 6. Nome do(s) produto(s) mais prejudicial para a saúde – quanto maiores os valores
 -- no atributo “saúde”, mais prejudiciais são para a mesma.
@@ -50,7 +49,8 @@ Where PROD.marca = COMP.prodMarca AND ELEM.codigo = COMP.elemento
                             FROM Produto PROD, Elemento ELEM, Composto COMP
                             Where PROD.marca = COMP.prodMarca AND ELEM.codigo = COMP.elemento
                             Group BY PROD.nome
-                            ORDER BY sum_saude DESC)
+                            ORDER BY sum_saude DESC
+			    Limit 1)
 
 -- 7. Liste o sexo e a idade de todas as pessoas abrangidas por esta base de dados –
 -- consumidores e seus dependentes.
