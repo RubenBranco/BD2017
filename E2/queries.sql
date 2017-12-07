@@ -43,15 +43,13 @@ GROUP BY P.nome;
 -- no atributo “saúde”, mais prejudiciais são para a mesma.
 
 SELECT PROD.nome
-FROM Produto PROD,Elemento ELEM, composto COMP
-Where PROD.marca = COMP.prodMarca AND ELEM.codigo = COMP.elemento
-       Group BY PROD.nome
-       HAVING SUM(saude) = (Select SUM(COMP.percentagem * ELEM.saude) AS sum_saude
-                            FROM Produto PROD, Elemento ELEM, composto COMP
-                            Where PROD.marca = COMP.prodMarca AND ELEM.codigo = COMP.elemento
-                            Group BY PROD.nome
-                            ORDER BY sum_saude DESC
-			    Limit 1);
+FROM Produto PROD, Elemento ELEM, composto COMP
+Where PROD.marca = COMP.prodMarca AND PROD.codigo = COMP.produto AND ELEM.codigo = COMP.elemento
+Group BY COMP.produto, COMP.prodMarca, COMP.elemento
+HAVING SUM(COMP.percentagem * ELEM.saude) = (Select MAX(SUM(COMP.percentagem * ELEM.saude))
+                    FROM Produto PROD, Elemento ELEM, composto COMP
+                    Where PROD.marca = COMP.prodMarca AND ELEM.codigo = COMP.elemento AND PROD.codigo = COMP.produto
+                    Group BY PROD.nome);
 
 -- 7. Liste o sexo e a idade de todas as pessoas abrangidas por esta base de dados –
 -- consumidores e seus dependentes.
@@ -63,19 +61,22 @@ SELECT Dependente.sexo, year(CURDATE()) - year(Dependente.nascimento) as Idade F
 -- 8. Email do(s) consumidor(es) que registou compras implicando menor pegada
 -- ecológica – ter em conta o número de dependentes, dividindo a mesma pelo
 -- número de pessoas no agregado (consumidor + número de dependentes).
+CREATE VIEW pegadaEcologica AS
+SELECT P.codigo, P.marca, SUM(C.percentagem * E.pegadaEcologica) as "Pegada"
+FROM Produto P, composto C, Elemento E
+WHERE C.produto = P.codigo AND C.prodMarca = P.marca AND C.elemento = E.codigo
+GROUP BY P.nome;
 
 SELECT C.email
-FROM Consumidor C, compra COMP, Dependente D, Elemento E, Produto P, composto CO
-WHERE C.numero = COMP.consumidor AND D.consumidor = C.numero AND COMP.produto = CO.produto AND COMP.prodMarca = CO.prodMarca AND CO.elemento = E.codigo
-
-
+FROM pegadaEcologica Pe, Consumidor C, Dependente D, compra COMP, Elemento E, composto CO
+WHERE
 -- 9. Email dos consumidores que realizaram compras que incluem todos os
 -- elementos mencionados na tabela “Elemento”.
 
-SELECT C.email
+SELECT DISTINCT C.email
 FROM Consumidor C, compra COMP, Elemento E, Produto P, composto CO
 WHERE C.numero = COMP.consumidor AND COMP.produto = P.codigo AND COMP.prodMarca = P.marca AND COMP.produto = CO.produto AND COMP.prodMarca = CO.prodMarca
-GROUP BY c.email
+GROUP BY COMP.produto, COMP.prodMarca, COMP.consumidor
 HAVING COUNT(CO.elemento) = (SELECT COUNT(*)	
 							  FROM Elemento E);
--- da erro nao sei pq
+-- ta a dar todos os consumidores, nao tenho acerteza se ta bem, alguem faça check??
