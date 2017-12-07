@@ -11,7 +11,7 @@ ORDER BY P.nome DESC;
 -- 2. Indique o sexo e a idade de cada um dos dependentes do consumidor com email
 -- 'marcolina@hotmail.com'.
 
-SELECT D.sexo, D.nascimento
+SELECT D.sexo, year(CURDATE()) - year(D.nascimento) as Idade
 FROM Dependente D, Consumidor C
 WHERE D.consumidor = C.numero AND C.email = 'marcolina@hotmail.com';
 
@@ -34,32 +34,28 @@ WHERE COMP.produto = 1 AND COMP.prodMarca = 16);
 
 -- 5. Determine a pegada ecológica associada a cada um dos produtos do tipo lar.
 
-SELECT P.nome, C.percentagem * E.pegadaEcologica as "Pegada Ecologica"
+SELECT P.nome, SUM(C.percentagem * E.pegadaEcologica) as "Pegada Ecologica"
 FROM Produto P, composto C, Elemento E
-WHERE P.tipo = 'lar' AND C.produto = P.codigo AND C.prodMarca = P.marca AND C.elemento = E.codigo;
+WHERE P.tipo = 'lar' AND C.produto = P.codigo AND C.prodMarca = P.marca AND C.elemento = E.codigo
+GROUP BY P.nome;
 
 -- 6. Nome do(s) produto(s) mais prejudicial para a saúde – quanto maiores os valores
 -- no atributo “saúde”, mais prejudiciais são para a mesma.
 
 SELECT PROD.nome
-FROM Produto PROD,Elemento ELEM, Composto COMP
+FROM Produto PROD,Elemento ELEM, composto COMP
 Where PROD.marca = COMP.prodMarca AND ELEM.codigo = COMP.elemento
        Group BY PROD.nome
-       HAVING SUM(saude) = (Select SUM(ELEM.saude) AS sum_saude
-                            FROM Produto PROD, Elemento ELEM, Composto COMP
+       HAVING SUM(saude) = (Select SUM(COMP.percentagem * ELEM.saude) AS sum_saude
+                            FROM Produto PROD, Elemento ELEM, composto COMP
                             Where PROD.marca = COMP.prodMarca AND ELEM.codigo = COMP.elemento
                             Group BY PROD.nome
                             ORDER BY sum_saude DESC
-			    Limit 1)
+			    Limit 1);
 
 -- 7. Liste o sexo e a idade de todas as pessoas abrangidas por esta base de dados –
 -- consumidores e seus dependentes.
--- NOT COMPLETE
-SELECT CONS.sexo, year(CURDATE()) - year(CONS.nascimento) as Idade
-FROM Consumidor CONS
-LEFT JOIN Dependente ON CONS.numero = Dependente.consumidor
-
--- Correct?
+	
 SELECT Consumidor.sexo, year(CURDATE()) - year(Consumidor.nascimento) as Idade FROM Consumidor
 UNION ALL
 SELECT Dependente.sexo, year(CURDATE()) - year(Dependente.nascimento) as Idade FROM Dependente;
@@ -71,7 +67,6 @@ SELECT Dependente.sexo, year(CURDATE()) - year(Dependente.nascimento) as Idade F
 SELECT C.email
 FROM Consumidor C, compra COMP, Dependente D, Elemento E, Produto P, composto CO
 WHERE C.numero = COMP.consumidor AND D.consumidor = C.numero AND COMP.produto = CO.produto AND COMP.prodMarca = CO.prodMarca AND CO.elemento = E.codigo
-GROUP BY  
 
 
 -- 9. Email dos consumidores que realizaram compras que incluem todos os
