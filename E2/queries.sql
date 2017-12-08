@@ -44,12 +44,12 @@ GROUP BY P.nome;
 
 SELECT PROD.nome
 FROM Produto PROD, Elemento ELEM, composto COMP
-Where PROD.marca = COMP.prodMarca AND PROD.codigo = COMP.produto AND ELEM.codigo = COMP.elemento
-Group BY COMP.produto, COMP.prodMarca, COMP.elemento
-HAVING SUM((COMP.percentagem/100) * ELEM.saude) = (Select MAX(SUM(COMP.percentagem * ELEM.saude))
+WHERE PROD.marca = COMP.prodMarca AND PROD.codigo = COMP.produto AND ELEM.codigo = COMP.elemento
+GROUP BY COMP.produto, COMP.prodMarca, COMP.elemento
+HAVING SUM((COMP.percentagem/100) * ELEM.saude) = (Select MAX(SUM((COMP.percentagem/100) * ELEM.saude))
                     FROM Produto PROD, Elemento ELEM, composto COMP
-                    Where PROD.marca = COMP.prodMarca AND ELEM.codigo = COMP.elemento AND PROD.codigo = COMP.produto
-                    Group BY PROD.nome);
+                    WHERE PROD.marca = COMP.prodMarca AND ELEM.codigo = COMP.elemento AND PROD.codigo = COMP.produto
+                    GROUP BY PROD.nome);
 
 -- 7. Liste o sexo e a idade de todas as pessoas abrangidas por esta base de dados –
 -- consumidores e seus dependentes.
