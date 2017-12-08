@@ -61,22 +61,25 @@ SELECT Dependente.sexo, year(CURDATE()) - year(Dependente.nascimento) as Idade F
 -- 8. Email do(s) consumidor(es) que registou compras implicando menor pegada
 -- ecológica – ter em conta o número de dependentes, dividindo a mesma pelo
 -- número de pessoas no agregado (consumidor + número de dependentes).
+
 CREATE VIEW pegadaEcologica AS
-SELECT P.codigo, P.marca, SUM(C.percentagem * E.pegadaEcologica) as "Pegada"
-FROM Produto P, composto C, Elemento E
-WHERE C.produto = P.codigo AND C.prodMarca = P.marca AND C.elemento = E.codigo
-GROUP BY P.nome;
+SELECT CO.numero as "Numero", P.codigo as "Codigo", P.marca as "Marca", SUM(C.percentagem * E.pegadaEcologica) as "Pegada"
+FROM Produto P, composto C, Elemento E, Consumidor CO, compra COMP
+WHERE COMP.consumidor = CO.numero AND COMP.prodMarca = C.prodMarca AND COMP.produto = C.produto AND C.elemento = E.codigo
+GROUP BY COMP.consumidor, COMP.prodMarca, COMP.produto;
 
 SELECT C.email
-FROM pegadaEcologica Pe, Consumidor C, Dependente D, compra COMP, Elemento E, composto CO
-WHERE
+FROM pegadaEcologica Pe LEFT OUTER JOIN Consumidor C ON (Pe.Numero = C.numero), Dependente D
+WHERE C.numero = D.consumidor
+GROUP BY Pe.Numero, Pe.Codigo, Pe.Marca, Pe.Pegada
+HAVING (Pe.Pegada / 1 + COUNT(D.numero)) = (SELECT MIN(Pe.Pegada / 1 + COUNT(D.numero))
+FROM pegadaEcologica Pe LEFT OUTER JOIN Consumidor C ON (Pe.Numero = C.numero), Dependente D
+WHERE C.numero = D.consumidor
+GROUP BY Pe.Numero, Pe.Codigo, Pe.Marca, Pe.Pegada);
+
 -- 9. Email dos consumidores que realizaram compras que incluem todos os
 -- elementos mencionados na tabela “Elemento”.
 
 SELECT DISTINCT C.email
-FROM Consumidor C, compra COMP, Elemento E, Produto P, composto CO
-WHERE C.numero = COMP.consumidor AND COMP.produto = P.codigo AND COMP.prodMarca = P.marca AND COMP.produto = CO.produto AND COMP.prodMarca = CO.prodMarca
-GROUP BY COMP.produto, COMP.prodMarca, COMP.consumidor
-HAVING COUNT(CO.elemento) = (SELECT COUNT(*)	
-							  FROM Elemento E);
+FROM pegadaEcologica Pe LEFT OUTER JOIN Consumidor C ON (Pe.Numero = C.numero), compra C, composto CO, 
 -- ta a dar todos os consumidores, nao tenho acerteza se ta bem, alguem faça check??
