@@ -34,7 +34,7 @@ WHERE COMP.produto = 1 AND COMP.prodMarca = 16);
 
 -- 5. Determine a pegada ecológica associada a cada um dos produtos do tipo lar.
 
-SELECT P.nome, SUM(C.percentagem * E.pegadaEcologica) as "Pegada Ecologica"
+SELECT P.nome, SUM((C.percentagem/100) * E.pegadaEcologica) as "Pegada Ecologica"
 FROM Produto P, composto C, Elemento E
 WHERE P.tipo = 'lar' AND C.produto = P.codigo AND C.prodMarca = P.marca AND C.elemento = E.codigo
 GROUP BY P.nome;
@@ -46,7 +46,7 @@ SELECT PROD.nome
 FROM Produto PROD, Elemento ELEM, composto COMP
 Where PROD.marca = COMP.prodMarca AND PROD.codigo = COMP.produto AND ELEM.codigo = COMP.elemento
 Group BY COMP.produto, COMP.prodMarca, COMP.elemento
-HAVING SUM(COMP.percentagem * ELEM.saude) = (Select MAX(SUM(COMP.percentagem * ELEM.saude))
+HAVING SUM((COMP.percentagem/100) * ELEM.saude) = (Select MAX(SUM(COMP.percentagem * ELEM.saude))
                     FROM Produto PROD, Elemento ELEM, composto COMP
                     Where PROD.marca = COMP.prodMarca AND ELEM.codigo = COMP.elemento AND PROD.codigo = COMP.produto
                     Group BY PROD.nome);
