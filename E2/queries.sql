@@ -34,7 +34,7 @@ WHERE COMP.produto = 1 AND COMP.prodMarca = 16);
 
 -- 5. Determine a pegada ecológica associada a cada um dos produtos do tipo lar.
 
-SELECT P.nome, SUM((C.percentagem/100) * E.pegadaEcologica) as "Pegada Ecologica"
+SELECT P.nome, SUM((C.percentagem / 100) * E.pegadaEcologica) as "Pegada Ecologica"
 FROM Produto P, composto C, Elemento E
 WHERE P.tipo = 'lar' AND C.produto = P.codigo AND C.prodMarca = P.marca AND C.elemento = E.codigo
 GROUP BY P.nome;
@@ -42,14 +42,17 @@ GROUP BY P.nome;
 -- 6. Nome do(s) produto(s) mais prejudicial para a saúde – quanto maiores os valores
 -- no atributo “saúde”, mais prejudiciais são para a mesma.
 
-SELECT PROD.nome
-FROM Produto PROD, Elemento ELEM, composto COMP
-WHERE PROD.marca = COMP.prodMarca AND PROD.codigo = COMP.produto AND ELEM.codigo = COMP.elemento
-GROUP BY COMP.produto, COMP.prodMarca, COMP.elemento
-HAVING SUM((COMP.percentagem/100) * ELEM.saude) = (Select MAX(SUM((COMP.percentagem/100) * ELEM.saude))
-                    FROM Produto PROD, Elemento ELEM, composto COMP
-                    WHERE PROD.marca = COMP.prodMarca AND ELEM.codigo = COMP.elemento AND PROD.codigo = COMP.produto
-                    GROUP BY PROD.nome);
+SELECT PROD.nome 
+FROM Produto PROD,Elemento ELEM, composto COMP 
+Where PROD.marca = COMP.prodMarca AND ELEM.codigo = COMP.elemento 
+Group BY PROD.nome 
+HAVING SUM(saude * (percentagem / 100)) = (Select SUM(ELEM.saude * (COMP.percentagem / 100)) AS sum_saude 
+                                           FROM Produto PROD, Elemento ELEM, composto COMP 
+                                           Where PROD.marca = COMP.prodMarca 
+                                           AND ELEM.codigo = COMP.elemento 
+                                           Group BY PROD.nome 
+                                           ORDER BY sum_saude Desc 
+                                           LIMIT 1);
 
 -- 7. Liste o sexo e a idade de todas as pessoas abrangidas por esta base de dados –
 -- consumidores e seus dependentes.
@@ -63,19 +66,17 @@ SELECT Dependente.sexo, year(CURDATE()) - year(Dependente.nascimento) as Idade F
 -- número de pessoas no agregado (consumidor + número de dependentes).
 
 CREATE VIEW pegadaEcologica AS
-SELECT CO.numero as "Numero", P.codigo as "Codigo", P.marca as "Marca", SUM(C.percentagem * E.pegadaEcologica) as "Pegada"
-FROM Produto P, composto C, Elemento E, Consumidor CO, compra COMP
-WHERE COMP.consumidor = CO.numero AND COMP.prodMarca = C.prodMarca AND COMP.produto = C.produto AND C.elemento = E.codigo
-GROUP BY COMP.consumidor, COMP.prodMarca, COMP.produto;
+SELECT P.codigo as "Codigo", P.marca as "Marca", SUM((C.percentagem / 100) * E.pegadaEcologica) as "Pegada"
+FROM Produto P, composto C, Elemento E
+WHERE P.codigo = C.produto AND P.marca = C.prodMarca AND C.elemento = E.codigo
+GROUP BY P.codigo, P.marca;
 
 SELECT C.email
-FROM pegadaEcologica Pe LEFT OUTER JOIN Consumidor C ON (Pe.Numero = C.numero), Dependente D
-WHERE C.numero = D.consumidor
-GROUP BY Pe.Numero, Pe.Codigo, Pe.Marca, Pe.Pegada
+FROM pegadaEcologica Pe LEFT OUTER JOIN compra COMP ON (Pe.Codigo = COMP.produto AND Pe.Marca = COMP.prodMarca) LEFT OUTER JOIN Consumidor C ON (COMP.consumidor = C.numero) LEFT OUTER JOIN Dependente D ON (D.consumidor = C.numero)
+GROUP BY Pe.codigo, Pe.marca, C.numero, Pe.Pegada
 HAVING (Pe.Pegada / 1 + COUNT(D.numero)) = (SELECT MIN(Pe.Pegada / 1 + COUNT(D.numero))
-FROM pegadaEcologica Pe LEFT OUTER JOIN Consumidor C ON (Pe.Numero = C.numero), Dependente D
-WHERE C.numero = D.consumidor
-GROUP BY Pe.Numero, Pe.Codigo, Pe.Marca, Pe.Pegada);
+FROM pegadaEcologica Pe LEFT OUTER JOIN compra COMP ON (Pe.Codigo = COMP.produto AND Pe.Marca = COMP.prodMarca) LEFT OUTER JOIN Consumidor C ON (COMP.consumidor = C.numero) LEFT OUTER JOIN Dependente D ON (D.consumidor = C.numero)
+GROUP BY Pe.codigo, Pe.marca, C.numero, Pe.Pegada)
 
 -- 9. Email dos consumidores que realizaram compras que incluem todos os
 -- elementos mencionados na tabela “Elemento”.
