@@ -72,15 +72,20 @@ WHERE P.codigo = C.produto AND P.marca = C.prodMarca AND C.elemento = E.codigo
 GROUP BY P.codigo, P.marca;
 
 SELECT C.email
-FROM pegadaEcologica Pe LEFT OUTER JOIN compra COMP ON (Pe.Codigo = COMP.produto AND Pe.Marca = COMP.prodMarca) LEFT OUTER JOIN Consumidor C ON (COMP.consumidor = C.numero) LEFT OUTER JOIN Dependente D ON (D.consumidor = C.numero)
-GROUP BY Pe.codigo, Pe.marca, C.numero, Pe.Pegada
-HAVING (Pe.Pegada / 1 + COUNT(D.numero)) = (SELECT MIN(Pe.Pegada / 1 + COUNT(D.numero))
-FROM pegadaEcologica Pe LEFT OUTER JOIN compra COMP ON (Pe.Codigo = COMP.produto AND Pe.Marca = COMP.prodMarca) LEFT OUTER JOIN Consumidor C ON (COMP.consumidor = C.numero) LEFT OUTER JOIN Dependente D ON (D.consumidor = C.numero)
-GROUP BY Pe.codigo, Pe.marca, C.numero, Pe.Pegada)
+FROM pegadaEcologica Pe, compra COMP, Consumidor C LEFT OUTER JOIN Dependente D ON (D.consumidor = C.numero)
+WHERE Pe.Codigo = COMP.produto AND Pe.Marca = COMP.prodMarca AND COMP.consumidor = C.numero
+GROUP BY C.numero, COMP.produto, COMP.prodMarca
+HAVING (SUM(COMP.quantidade * Pe.Pegada) / 1 + COUNT(DISTINCT D.numero)) <= ALL (SELECT (SUM(COMP.quantidade * Pe.Pegada) / 1 + COUNT(DISTINCT D.numero))
+FROM pegadaEcologica Pe, compra COMP, Consumidor C LEFT OUTER JOIN Dependente D ON (D.consumidor = C.numero)
+WHERE Pe.Codigo = COMP.produto AND Pe.Marca = COMP.prodMarca AND COMP.consumidor = C.numero
+GROUP BY C.numero, COMP.produto, COMP.prodMarca);
 
 -- 9. Email dos consumidores que realizaram compras que incluem todos os
 -- elementos mencionados na tabela “Elemento”.
 
-SELECT DISTINCT C.email
-FROM pegadaEcologica Pe LEFT OUTER JOIN Consumidor C ON (Pe.Numero = C.numero), compra C, composto CO, 
--- ta a dar todos os consumidores, nao tenho acerteza se ta bem, alguem faça check??
+SELECT C.email
+FROM Consumidor C, Elemento E, compra COMP, composto CO
+WHERE C.numero = COMP.consumidor AND CO.produto = COMP.produto AND CO.prodMarca = COMP.prodMarca
+GROUP BY C.numero
+HAVING COUNT(DISTINCT CO.elemento) = (SELECT COUNT(*)
+FROM Elemento E);
