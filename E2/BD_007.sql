@@ -74,11 +74,11 @@ GROUP BY P.codigo, P.marca;
 SELECT C.email
 FROM pegadaEcologica Pe, compra COMP, Consumidor C LEFT OUTER JOIN Dependente D ON (D.consumidor = C.numero)
 WHERE Pe.Codigo = COMP.produto AND Pe.Marca = COMP.prodMarca AND COMP.consumidor = C.numero
-GROUP BY C.numero, COMP.produto, COMP.prodMarca
+GROUP BY C.numero
 HAVING (SUM(COMP.quantidade * Pe.Pegada) / 1 + COUNT(DISTINCT D.numero)) <= ALL (SELECT (SUM(COMP.quantidade * Pe.Pegada) / 1 + COUNT(DISTINCT D.numero))
 FROM pegadaEcologica Pe, compra COMP, Consumidor C LEFT OUTER JOIN Dependente D ON (D.consumidor = C.numero)
 WHERE Pe.Codigo = COMP.produto AND Pe.Marca = COMP.prodMarca AND COMP.consumidor = C.numero
-GROUP BY C.numero, COMP.produto, COMP.prodMarca);
+GROUP BY C.numero);
 
 -- 9. Email dos consumidores que realizaram compras que incluem todos os
 -- elementos mencionados na tabela “Elemento”.
