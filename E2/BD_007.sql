@@ -65,20 +65,14 @@ SELECT Dependente.sexo, year(CURDATE()) - year(Dependente.nascimento) as Idade F
 -- ecológica – ter em conta o número de dependentes, dividindo a mesma pelo
 -- número de pessoas no agregado (consumidor + número de dependentes).
 
-CREATE VIEW pegadaEcologica AS
-SELECT P.codigo as "Codigo", P.marca as "Marca", SUM((C.percentagem / 100) * E.pegadaEcologica) as "Pegada"
-FROM Produto P, composto C, Elemento E
-WHERE P.codigo = C.produto AND P.marca = C.prodMarca AND C.elemento = E.codigo
-GROUP BY P.codigo, P.marca;
-
 SELECT C.email
-FROM pegadaEcologica Pe, compra COMP, Consumidor C LEFT OUTER JOIN Dependente D ON (D.consumidor = C.numero)
-WHERE Pe.Codigo = COMP.produto AND Pe.Marca = COMP.prodMarca AND COMP.consumidor = C.numero
-GROUP BY C.numero
-HAVING (SUM(COMP.quantidade * Pe.Pegada) / 1 + COUNT(DISTINCT D.numero)) <= ALL (SELECT (SUM(COMP.quantidade * Pe.Pegada) / 1 + COUNT(DISTINCT D.numero))
-FROM pegadaEcologica Pe, compra COMP, Consumidor C LEFT OUTER JOIN Dependente D ON (D.consumidor = C.numero)
-WHERE Pe.Codigo = COMP.produto AND Pe.Marca = COMP.prodMarca AND COMP.consumidor = C.numero
-GROUP BY C.numero);
+FROM composto COMPO, Elemento E, compra COMP, Consumidor C LEFT OUTER JOIN Dependente D ON (D.consumidor = C.numero)
+WHERE COMP.consumidor = C.numero AND COMP.produto = COMPO.produto AND COMP.prodMarca = COMPO.prodMarca AND COMPO.elemento = E.codigo
+GROUP BY C.numero, COMPO.prodMarca, COMPO.produto
+HAVING (SUM(COMP.quantidade * ((COMPO.percentagem/ 100) * E.pegadaEcologica)) / 1 + COUNT(DISTINCT D.numero)) <= ALL (SELECT SUM(COMP.quantidade * ((COMPO.percentagem/ 100) * E.pegadaEcologica)) / 1 + COUNT(DISTINCT D.numero)
+FROM composto COMPO, Elemento E, compra COMP, Consumidor C LEFT OUTER JOIN Dependente D ON (D.consumidor = C.numero)
+WHERE COMP.consumidor = C.numero AND COMP.produto = COMPO.produto AND COMP.prodMarca = COMPO.prodMarca AND COMPO.elemento = E.codigo
+GROUP BY C.numero, COMPO.prodMarca, COMPO.produto);
 
 -- 9. Email dos consumidores que realizaram compras que incluem todos os
 -- elementos mencionados na tabela “Elemento”.
